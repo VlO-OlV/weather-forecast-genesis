@@ -36,3 +36,5 @@ $ yarn start:dev
 ```bash
 $ docker-compose up --build
 ```
+## What was done?
+All main logic specified in the task was implemented
