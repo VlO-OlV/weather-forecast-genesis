@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Weather {
+  id          String   @id @default(uuid())
+  temperature Float
+  humidity    Int
+  description String?
+  city        City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  cityId      String   @unique @map("city_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("weathers")
+}
+
+model Subscription {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  city      City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  cityId    String    @map("city_id")
+  frequency Frequency
+  confirmed Boolean   @default(false)
+  token     String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("subscriptions")
+}
+
+enum Frequency {
+  hourly
+  daily
+}
+
+model City {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  weather       Weather?
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at")
+
+  @@map("cities")
+}
